@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CampusShare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .login-card { width: 100%; max-width: 400px; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: white; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="text-center mb-4">
+        <img src="/images/logoCS.png" alt="Logo CampusShare" height="80">
+        <h4 class="mt-2 fw-bold">CampusShare</h4>
+    </div>
+    <div id="alertMessage" class="alert alert-danger d-none"></div>
+    <form id="loginForm">
+        <div class="mb-3">
+            <label class="form-label">Masuk Pakai Email Mercubuana</label>
+            <input type="email" id="email" class="form-control" placeholder="email@mercubuana.ac.id" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="*******" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Masuk</button>
+    </form>
+    <p class="text-center mt-3">
+        Belum punya akun? <a href="/register">Daftar disini</a>
+    </p>
+</div>
+
+<script>
+    // JavaScript
+    const loginForm = document.getElementById('loginForm');
+    const alertBox = document.getElementById('alertMessage');
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Mencegah halaman refresh sendiri
+        // 1. Ambil data dari kotak input
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                //Jika Sukses, Simpan Token JWT ke penyimpanan browser (LocalStorage)
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('email', email);
+                localStorage.setItem('role', data.role);
+                window.location.href = '/dashboard';
+            } else {
+                // 4. JIKA GAGAL: Munculkan pesan error
+                alertBox.textContent = "Login Gagal: " + (data.message || "Periksa email/password");
+                alertBox.classList.remove('d-none');
+            }
+        } catch (error) {
+            alertBox.textContent = "Terjadi kesalahan koneksi!";
+            alertBox.classList.remove('d-none');
+        }
+    });
+</script>
+</body>
+</html>
