@@ -98,6 +98,12 @@
 <!--// JavaScript-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Escape user-generated text before inserting it into innerHTML.
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+        }[char]));
+    }
     // 1. CEK TOKEN (Satpam Frontend)
     const token = localStorage.getItem('token');
     const email = localStorage.getItem('email');
@@ -110,7 +116,9 @@
     }
     // 2. FUNGSI LOGOUT
     function logout() {
-        localStorage.clear(); // Hapus token
+        localStorage.removeItem('token');
+        localStorage.removeItem('email');
+        localStorage.removeItem('role'); // Only clear CampusShare keys
         window.location.href = '/login';
     }
     // 3. FUNGSI LOAD NOTES (GET API)
@@ -127,7 +135,7 @@
                     'Authorization': 'Bearer ' + token
                 }
             });
-            if (response.status === 403) {
+            if (response.status === 401 || response.status === 403) {
                 logout();
                 return;
             }
@@ -156,21 +164,21 @@
                         <div class="card card-note h-100">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge bg-info">${note.subject}</span>
+                                    <span class="badge bg-info">${escapeHtml(note.subject)}</span>
                                     ${deleteButtonHTML}
                                 </div>
-                                <h5 class="card-title fw-bold">${note.title}</h5>
-                                <p class="card-text small text-muted">${note.description || '-'}</p>
+                                <h5 class="card-title fw-bold">${escapeHtml(note.title)}</h5>
+                                <p class="card-text small text-muted">${escapeHtml(note.description || '-')}</p>
                                 <hr>
                                 <div class="d-flex justify-content-between align-items-center small">
-                                    <span><i class="fas fa-university me-1"></i> ${note.campus}</span>
+                                    <span><i class="fas fa-university me-1"></i> ${escapeHtml(note.campus)}</span>
                                     <span class="text-truncate" style="max-width: 120px;">
-                                        <i class="fas fa-user me-1"></i> ${note.uploaderEmail}
+                                        <i class="fas fa-user me-1"></i> ${escapeHtml(note.uploaderEmail)}
                                     </span>
                                 </div>
                             </div>
                             <div class="card-footer bg-white border-top-0">
-                                <a href="/api/notes/download/${note.fileUrl}" target="_blank" class="btn btn-outline-primary w-100 btn-sm">
+                                <a href="/api/notes/download/${encodeURIComponent(note.fileUrl ?? '')}" target="_blank" class="btn btn-outline-primary w-100 btn-sm">
                                     <i class="fas fa-download me-1"></i> Download
                                 </a>
                             </div>
@@ -226,7 +234,6 @@
             if (e.key === 'Enter') searchNotesMobile();
         });
     }
-    loadNotes();
     // 4. FUNGSI UPLOAD (POST API)
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         e.preventDefault();

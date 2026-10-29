@@ -18,6 +18,14 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String password; //disimpan dalam bentuk terenkripsi (acak)
-    private String role; //MAHASISWA atau ADMIN
+    private String password; // BCrypt hash; NEVER store a raw Google password.
+
+    private String role;
+
+    // Nullable so pre-existing user rows remain compatible with ddl-auto=update.
+    @Column(name = "auth_provider")
+    private String authProvider = "LOCAL";
+
+    @Column(name = "google_id", unique = true)
+    private String googleId;
 }

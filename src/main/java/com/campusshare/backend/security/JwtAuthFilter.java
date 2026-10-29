@@ -20,38 +20,26 @@ import java.util.ArrayList;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
-        String token = null;
-        String email = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            email = jwtUtils.getEmailFromToken(token);
-        }
-
-        //Validasi Token dan Set Autentikasi
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtUtils.validateToken(token)) {
-                // Ambil data user dari database
+            String token = authHeader.substring(7);
+            // Check validity FIRST; malformed/expired tokens must not crash the request.
+            if (jwtUtils.validateToken(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String email = jwtUtils.getEmailFromToken(token);
                 User user = userRepository.findByEmail(email).orElse(null);
-
                 if (user != null) {
-                    UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                            user.getEmail(),
-                            user.getPassword(),
-                            new ArrayList<>()
-                    );
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    UserDetails details = new org.springframework.security.core.userdetails.User(
+                        user.getEmail(), user.getPassword(), new ArrayList<>());
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        details, null, details.getAuthorities());
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
         }
