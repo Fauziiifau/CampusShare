@@ -5,7 +5,6 @@ import com.campusshare.backend.dto.RegisterRequest;
 import com.campusshare.backend.entity.User;
 import com.campusshare.backend.repository.UserRepository;
 import com.campusshare.backend.security.JwtUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +18,15 @@ import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
+
 public class AuthController {
+    // Constructor injection is explicit to avoid Lombok-related compilation issues.
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+    }
+
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

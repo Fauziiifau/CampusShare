@@ -12,6 +12,22 @@
   box-sizing: border-box;
 }
 
+/* Mengatur ukuran gambar logo */
+.auth-logo {
+  max-height: 80px;    /* Sesuaikan tingginya (misal: 40px - 60px) */
+  width: auto;         /* Menjaga rasio lebar gambar */
+  object-fit: contain; /* Agar gambar tidak gepeng */
+}
+
+/* Memastikan logo dan tulisan CampusShare sejajar rapi */
+.auth-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;          /* Jarak antara logo dan teks */
+  margin-bottom: 20px;
+}
+
 body.auth-body {
   margin: 0;
   min-height: 100vh;

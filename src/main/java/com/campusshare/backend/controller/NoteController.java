@@ -6,7 +6,6 @@ import com.campusshare.backend.entity.Note;
 import com.campusshare.backend.repository.NoteRepository;
 import com.campusshare.backend.service.FileStorageService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,8 +19,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
-@RequiredArgsConstructor
+
 public class NoteController {
+    // Constructor injection is explicit to avoid Lombok-related compilation issues.
+    public NoteController(FileStorageService fileStorageService, NoteRepository noteRepository, UserRepository userRepository) {
+        this.fileStorageService = fileStorageService;
+        this.noteRepository = noteRepository;
+        this.userRepository = userRepository;
+    }
+
 
     private final FileStorageService fileStorageService;
     private final NoteRepository noteRepository;

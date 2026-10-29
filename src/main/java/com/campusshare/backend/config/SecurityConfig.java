@@ -2,7 +2,6 @@ package com.campusshare.backend.config;
 
 import com.campusshare.backend.security.GoogleLoginSuccessHandler;
 import com.campusshare.backend.security.JwtAuthFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -19,8 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
+
 public class SecurityConfig {
+    // Constructor injection is explicit to avoid Lombok-related compilation issues.
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
+
     private final JwtAuthFilter jwtAuthFilter;
     // Google OAuth2 needs a temporary HttpSession to store the authorization request + CSRF state.
     // This chain deliberately does not use STATELESS.

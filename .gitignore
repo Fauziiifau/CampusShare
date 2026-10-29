@@ -33,3 +33,7 @@ build/
 .vscode/
 ### Custom Project ###
 /uploads/
+
+.env
+.env.*
+*.log

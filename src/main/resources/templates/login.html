@@ -9,8 +9,11 @@
 </head>
 <body class="auth-body">
 <main class="auth-card" aria-labelledby="pageTitle">
-  <div class="auth-brand"><span class="auth-mark" aria-hidden="true">CS</span>CampusShare</div>
-  <h1 class="auth-heading" id="pageTitle">Selamat datang kembali</h1>
+  <div class="auth-brand">
+    <img src="/images/logoCS.png"
+         alt="Logo CampusShare"
+         class="auth-logo">
+</div>
   <p class="auth-lead">Masuk untuk berbagi dan menemukan catatan kuliah.</p>
 
   <div id="message" class="form-message" role="alert" aria-live="polite" hidden></div>
@@ -38,10 +41,6 @@
   </a>
 
   <p class="auth-footer">Belum punya akun? <a href="/register">Daftar sekarang</a></p>
-  <details class="auth-help">
-    <summary>Butuh bantuan untuk masuk?</summary>
-    <p>Pastikan email dan password benar. Jika mendaftar melalui Google, gunakan tombol Google di atas. Fitur reset password belum tersedia pada versi ini.</p>
-  </details>
 </main>
 <script>
   const form = document.querySelector('#loginForm');
